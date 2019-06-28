@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,6 +21,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -70,5 +72,16 @@ class TodoControllerTest {
         ResultActions result = mvc.perform(get("/todos/1"));
         //then
         result.andExpect(status().isNotFound());
+    }
+
+    @Test
+    void saveTodo() throws Exception {
+        //when
+        String todo = "{\"id\":1,\"title\":\"2\",\"completed\":false,\"order\":3,\"url\":\"\"}";
+        ResultActions result = mvc.perform(post("/todos").contentType(MediaType.APPLICATION_JSON).content(todo));
+        //then
+        result.andExpect(status().isCreated())
+                .andDo(print())
+                .andExpect(content().string(is(todo)));
     }
 }
