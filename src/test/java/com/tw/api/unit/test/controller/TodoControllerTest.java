@@ -13,13 +13,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Arrays;
+import java.util.Optional;
 
+import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(TodoController.class)
@@ -47,4 +49,16 @@ class TodoControllerTest {
                 .andExpect(content().string(is(except)));
     }
 
+    @Test
+    void getTodo() throws Exception {
+        //given
+        when(todoRepository.findById(1)).thenReturn(Optional.of(new Todo(1, "2", false, 3)));
+        //when
+        ResultActions result = mvc.perform(get("/todos/1"));
+        //then
+        String except = "{\"id\":1,\"title\":\"2\",\"completed\":false,\"order\":3,\"url\":\"\"}";
+        result.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().string(is(except)));
+    }
 }
