@@ -16,14 +16,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(TodoController.class)
@@ -83,5 +81,25 @@ class TodoControllerTest {
         result.andExpect(status().isCreated())
                 .andDo(print())
                 .andExpect(content().string(is(todo)));
+    }
+
+    @Test
+    void deleteTodo() throws Exception {
+        //given
+        when(todoRepository.findById(1)).thenReturn(Optional.of(new Todo(1, "2", false, 3)));
+        //when
+        ResultActions result = mvc.perform(delete("/todos/1"));
+        //then
+        result.andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteTodoNotFound() throws Exception {
+        //given
+        when(todoRepository.findById(1)).thenReturn(Optional.empty());
+        //when
+        ResultActions result = mvc.perform(delete("/todos/1"));
+        //then
+        result.andExpect(status().isNotFound());
     }
 }
