@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -99,6 +100,29 @@ class TodoControllerTest {
         when(todoRepository.findById(1)).thenReturn(Optional.empty());
         //when
         ResultActions result = mvc.perform(delete("/todos/1"));
+        //then
+        result.andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateTodo() throws Exception {
+        //given
+        String todo = "{\"id\":1,\"title\":\"2\",\"completed\":true,\"order\":3,\"url\":\"\"}";
+        when(todoRepository.findById(1)).thenReturn(Optional.of(new Todo(1, "2", false, 3)));
+        //when
+        ResultActions result = mvc.perform(patch("/todos/1").contentType(MediaType.APPLICATION_JSON).content(todo));
+        //then
+        result.andExpect(status().isOk());
+        verify(this.todoRepository).add(new Todo(1, "2", true, 3));
+    }
+
+    @Test
+    void updateTodoNotFound() throws Exception {
+        //given
+        String todo = "{\"id\":1,\"title\":\"2\",\"completed\":true,\"order\":3,\"url\":\"\"}";
+        when(todoRepository.findById(1)).thenReturn(Optional.empty());
+        //when
+        ResultActions result = mvc.perform(patch("/todos/1").contentType(MediaType.APPLICATION_JSON).content(todo));
         //then
         result.andExpect(status().isNotFound());
     }
