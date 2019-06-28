@@ -61,4 +61,14 @@ class TodoControllerTest {
                 .andDo(print())
                 .andExpect(content().string(is(except)));
     }
+
+    @Test
+    void getTodoNotFound() throws Exception {
+        //given
+        when(todoRepository.findById(1)).thenReturn(Optional.empty());
+        //when
+        ResultActions result = mvc.perform(get("/todos/1"));
+        //then
+        result.andExpect(status().isNotFound());
+    }
 }
