@@ -126,4 +126,14 @@ class TodoControllerTest {
         //then
         result.andExpect(status().isNotFound());
     }
+
+    @Test
+    void updateTodoBadRequest() throws Exception {
+        //given
+        when(todoRepository.findById(1)).thenReturn(Optional.of(new Todo(1, "2", false, 3)));
+        //when
+        ResultActions result = mvc.perform(patch("/todos/1").contentType(MediaType.APPLICATION_JSON));
+        //then
+        result.andExpect(status().isBadRequest());
+    }
 }
